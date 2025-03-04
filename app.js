@@ -1,4 +1,3 @@
-import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import express from "express";
 
@@ -11,7 +10,6 @@ const port = process.env.PORT || 3000;
 
 const app = express();
 app.use(express.json());
-app.use(cookieParser());
 
 app.use("/auth", authRoutes);
 app.use("/events", eventsRoutes);
