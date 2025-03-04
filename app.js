@@ -1,15 +1,19 @@
+import cookieParser from "cookie-parser";
+import dotenv from "dotenv";
 import express from "express";
 
+import authRoutes from "./routes/auth.routes.js";
+import eventsRoutes from "./routes/events.routes.js";
+
+dotenv.config();
+
+const port = process.env.PORT || 3000;
+
 const app = express();
+app.use(express.json());
+app.use(cookieParser());
 
-const PORT = process.env.Port || 3000;
+app.use("/auth", authRoutes);
+app.use("/events", eventsRoutes);
 
-app.get("/", (req, res) => {
-    res.json({
-        message: "Hello world",
-    });
-});
-
-app.listen(PORT, () => {
-    console.log(`Server is listening on port ${PORT}`);
-});
+app.listen(3000, () => console.log(`Server running on port ${port}`));
