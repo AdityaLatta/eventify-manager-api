@@ -3,8 +3,10 @@ import express from "express";
 
 import authRoutes from "./routes/auth.routes.js";
 import eventsRoutes from "./routes/events.routes.js";
+import { client } from "./services/discordBot.js";
 
 dotenv.config();
+client.login(process.env.DISCORD_BOT_TOKEN);
 
 const port = process.env.PORT || 3000;
 

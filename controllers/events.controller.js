@@ -1,7 +1,7 @@
 import { google } from "googleapis";
 import { oauth2Client } from "../services/auth.service.js";
 
-const calendar = google.calendar({ version: "v3", auth: oauth2Client });
+export const calendar = google.calendar({ version: "v3", auth: oauth2Client });
 
 export const getAllEvents = async (req, res) => {
     try {
