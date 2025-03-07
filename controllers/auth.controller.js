@@ -1,19 +1,13 @@
+import { User } from "../models/user.model.js";
 import {
     generateAuthUrl,
-    getToken,
+    getJwtToken,
+    getUserProfile,
     oauth2Client,
-    removeToken,
-    saveToken,
-} from "../services/auth.service.js";
+    saveUser,
+} from "../services/google/auth.service.js";
 
 export const login = (req, res) => {
-    const token = getToken();
-
-    if (token && token.expiry_date > Date.now()) {
-        oauth2Client.setCredentials(token);
-        return res.redirect("/events");
-    }
-
     const url = generateAuthUrl();
     res.json({ Message: "Please visit url below to login", url });
 };
@@ -24,14 +18,38 @@ export const auth = async (req, res) => {
         const { tokens } = await oauth2Client.getToken(code);
         oauth2Client.setCredentials(tokens);
 
-        saveToken(tokens);
-        res.send("Authentication successful! You can now create events.");
+        let { email } = await getUserProfile();
+
+        const user = await saveUser(email, tokens.refresh_token);
+
+        const payload = { userId: user.id };
+
+        const token = getJwtToken(payload);
+
+        res.json({ token });
     } catch (error) {
         res.status(500).send("Authentication failed");
     }
 };
 
 export const logout = (req, res) => {
-    removeToken();
-    res.json({ message: "User logged out successfully!" });
+    res.send("To be done");
+};
+
+export const updateDiscord = async (req, res) => {
+    const { email, discordId } = req.body;
+
+    try {
+        const user = await User.findOne({ where: { email } });
+
+        if (!user) return res.status(404).json({ message: "User not found" });
+
+        user.discordId = discordId;
+        await user.save();
+
+        res.json({ message: "Discord ID updated successfully" });
+    } catch (error) {
+        console.error("Error updating Discord ID:", error);
+        res.status(500).json({ message: "Server error" });
+    }
 };

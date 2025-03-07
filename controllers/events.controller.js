@@ -1,5 +1,5 @@
 import { google } from "googleapis";
-import { oauth2Client } from "../services/auth.service.js";
+import { oauth2Client } from "../services/google/auth.service.js";
 
 export const calendar = google.calendar({ version: "v3", auth: oauth2Client });
 

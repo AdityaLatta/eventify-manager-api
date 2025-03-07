@@ -1,4 +1,4 @@
-import express from "express";
+import { Router } from "express";
 import {
     addEvent,
     deleteEvent,
@@ -7,11 +7,13 @@ import {
 } from "../controllers/events.controller.js";
 import { isAuthenticated } from "../middlewares/auth.middleware.js";
 
-const router = express.Router();
+const router = Router();
 
 router.use(isAuthenticated);
 
-router.route("/").get(getAllEvents).post(addEvent);
-router.route("/:id").put(updateEvent).delete(deleteEvent);
+router.get("/", getAllEvents);
+router.post("/", addEvent);
+router.put("/:id", updateEvent);
+router.delete("/:id", deleteEvent);
 
 export default router;

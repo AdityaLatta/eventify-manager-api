@@ -25,9 +25,7 @@ build/
 .DS_Store
 
 # Google API credentials and tokens
-config
 token.json
-credentials.json
 
 # Editor and OS specific files
 .vscode/

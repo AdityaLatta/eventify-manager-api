@@ -1,12 +1,19 @@
 import { Router } from "express";
-import { auth, login, logout } from "../controllers/auth.controller.js";
+import {
+    auth,
+    login,
+    logout,
+    updateDiscord,
+} from "../controllers/auth.controller.js";
 
 const router = Router();
 
-router.get("/login", login);
+router.post("/login", login);
 
 router.get("/", auth);
 
-router.get("/logout", logout);
+router.post("/logout", logout);
+
+router.post("/update-discord", updateDiscord);
 
 export default router;
