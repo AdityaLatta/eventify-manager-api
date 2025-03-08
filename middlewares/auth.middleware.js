@@ -2,18 +2,12 @@ import { config } from "../config/index.js";
 import { User } from "../models/user.model.js";
 import { oauth2Client } from "../services/google/auth.service.js";
 import jwt from "jsonwebtoken";
+import { logger } from "../utils/winston.js";
 
 export async function isAuthenticated(req, res, next) {
     try {
-        const authHeader = req.headers.authorization;
+        const token = req.cookies.token;
 
-        if (!authHeader || !authHeader.startsWith("Bearer ")) {
-            return res
-                .status(401)
-                .json({ message: "Missing or invalid token" });
-        }
-
-        const token = authHeader.split(" ")[1];
         const decodedToken = jwt.verify(token, config.jwt.JWT_SECRET);
 
         const userId = decodedToken.userId;
@@ -32,7 +26,7 @@ export async function isAuthenticated(req, res, next) {
 
         next();
     } catch (error) {
-        console.error("Authentication Error:", error);
+        logger.error(error.message);
         res.status(500).json({ message: "User not authenticated" });
     }
 }

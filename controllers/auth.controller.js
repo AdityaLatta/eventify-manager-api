@@ -26,14 +26,20 @@ export const auth = async (req, res) => {
 
         const token = getJwtToken(payload);
 
-        res.json({ token });
+        res.cookie("token", token, {
+            maxAge: 24 * 60 * 60 * 1000,
+            httpOnly: true,
+        });
+
+        res.redirect("http://localhost:5173/");
     } catch (error) {
         res.status(500).send("Authentication failed");
     }
 };
 
 export const logout = (req, res) => {
-    res.send("To be done");
+    res.clearCookie("token");
+    res.status(200).json({ message: "Logged out successfully" });
 };
 
 export const updateDiscord = async (req, res) => {

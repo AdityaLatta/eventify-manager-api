@@ -7,6 +7,7 @@ import { sequelize, connectDB } from "./services/Database/database.js";
 import morgan from "morgan";
 import { logger } from "./utils/winston.js";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 
 connectDB();
 
@@ -22,6 +23,7 @@ const port = config.port || 3000;
 const app = express();
 app.use(express.json());
 app.use(cors());
+app.use(cookieParser());
 app.use(morgan("dev"));
 
 app.use("/auth", authRoutes);

@@ -26,12 +26,6 @@ const generateAuthUrl = () => {
     return url;
 };
 
-const getToken = async (email) => {
-    let user = await User.findOne({ where: { email } });
-
-    return user.googleRefreshToken;
-};
-
 const getUserProfile = async () => {
     const oauth2 = google.oauth2({ version: "v2", auth: oauth2Client });
     const userInfo = await oauth2.userinfo.get();
@@ -56,14 +50,7 @@ async function saveUser(email, googleRefreshToken) {
 }
 
 function getJwtToken(payload) {
-    return jwt.sign(payload, config.jwt.JWT_SECRET);
+    return jwt.sign(payload, config.jwt.JWT_SECRET, { expiresIn: "1d" });
 }
 
-export {
-    generateAuthUrl,
-    getJwtToken,
-    getToken,
-    getUserProfile,
-    oauth2Client,
-    saveUser,
-};
+export { generateAuthUrl, getJwtToken, getUserProfile, oauth2Client, saveUser };
