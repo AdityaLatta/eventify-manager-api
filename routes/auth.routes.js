@@ -2,7 +2,6 @@ import { Router } from "express";
 import {
     auth,
     checkAuth,
-    getUserInfo,
     login,
     logout,
     updateDiscord,
@@ -15,8 +14,6 @@ router.post("/login", login);
 router.get("/", auth);
 
 router.get("/check-auth", checkAuth);
-
-router.get("/get-user", getUserInfo);
 
 router.post("/logout", logout);
 

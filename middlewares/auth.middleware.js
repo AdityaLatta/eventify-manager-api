@@ -6,15 +6,7 @@ import { logger } from "../utils/winston.js";
 
 export async function isAuthenticated(req, res, next) {
     try {
-        const authHeader = req.headers.authorization;
-
-        if (!authHeader || !authHeader.startsWith("Bearer ")) {
-            return res
-                .status(401)
-                .json({ message: "Missing or invalid token" });
-        }
-
-        const token = authHeader.split(" ")[1];
+        const token = req.cookies.token;
 
         const decodedToken = jwt.verify(token, config.jwt.JWT_SECRET);
 

@@ -47,21 +47,9 @@ export const checkAuth = async (req, res) => {
             return res.status(401).json({ message: "Not authenticated" });
         }
 
-        res.redirect("http://localhost:5173/");
-    } catch (error) {
-        res.status(401).json({ message: "Invalid token" });
-    }
-};
-
-export const getUserInfo = (req, res) => {
-    try {
-        const token = req.cookies.token;
-
-        if (!token) {
-            return res.status(401).json({ message: "Not authenticated" });
-        }
-
-        res.json({ token });
+        res.redirect(
+            `http://localhost:5173/?data=${encodeURIComponent(token)}`
+        );
     } catch (error) {
         res.status(401).json({ message: "Invalid token" });
     }
