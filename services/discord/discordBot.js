@@ -13,11 +13,10 @@ export const client = new Client({
 
 client.once("ready", async () => {
     logger.info(`Logged in as ${client.user.tag}!`);
-    logger;
 
-    cron.schedule("* * * * *", async () => {
-        await scheduleReminders();
-    });
+    // cron.schedule("* * * * *", async () => {
+    //     await scheduleReminders();
+    // });
 });
 
 async function sendReminder(email, message) {

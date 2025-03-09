@@ -27,21 +27,20 @@ export const auth = async (req, res) => {
         const token = getJwtToken(payload);
 
         res.cookie("token", token, {
-            maxAge: 24 * 60 * 60 * 1000,
-            httpOnly: true,
-            secure: true,
-            sameSite: "None",
+            httpOnly: true, // JavaScript cannot access this cookie
+            secure: true, // Only send cookie over HTTPS (use false for localhost testing)
+            sameSite: "None", // Prevents CSRF attacks (use 'None' if working with different domains)
+            maxAge: 36000000, // 10 hour expiration
         });
 
-        res.redirect("http://localhost:5173/");
+        res.redirect("http://localhost:5173");
     } catch (error) {
         res.status(500).send("Authentication failed");
     }
 };
 
 export const logout = (req, res) => {
-    res.clearCookie("token");
-    res.status(200).json({ message: "Logged out successfully" });
+    res.send("To be done");
 };
 
 export const updateDiscord = async (req, res) => {
