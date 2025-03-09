@@ -27,15 +27,43 @@ export const auth = async (req, res) => {
         const token = getJwtToken(payload);
 
         res.cookie("token", token, {
-            httpOnly: true, // JavaScript cannot access this cookie
-            secure: true, // Only send cookie over HTTPS (use false for localhost testing)
-            sameSite: "None", // Prevents CSRF attacks (use 'None' if working with different domains)
-            maxAge: 36000000, // 10 hour expiration
+            httpOnly: true,
+            secure: true,
+            sameSite: "None",
+            maxAge: 36000000,
         });
 
-        res.redirect("/events");
+        res.redirect("auth/check-auth");
     } catch (error) {
         res.status(500).send("Authentication failed");
+    }
+};
+
+export const checkAuth = async (req, res) => {
+    try {
+        const token = req.cookies.token;
+
+        if (!token) {
+            return res.status(401).json({ message: "Not authenticated" });
+        }
+
+        res.redirect("http://localhost:5173/");
+    } catch (error) {
+        res.status(401).json({ message: "Invalid token" });
+    }
+};
+
+export const getUserInfo = (req, res) => {
+    try {
+        const token = req.cookies.token;
+
+        if (!token) {
+            return res.status(401).json({ message: "Not authenticated" });
+        }
+
+        res.json({ token });
+    } catch (error) {
+        res.status(401).json({ message: "Invalid token" });
     }
 };
 

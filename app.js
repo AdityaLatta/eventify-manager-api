@@ -23,9 +23,11 @@ const port = config.port || 3000;
 const app = express();
 app.use(express.json());
 
+const allowedOrigins = ["https://eventify.vercel.app", "http://localhost:5173"];
+
 app.use(
     cors({
-        origin: "http://localhost:5173",
+        origin: allowedOrigins,
         credentials: true,
     })
 );
