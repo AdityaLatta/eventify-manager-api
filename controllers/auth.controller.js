@@ -26,30 +26,31 @@ export const auth = async (req, res) => {
 
         const token = getJwtToken(payload);
 
-        res.cookie("token", token, {
-            httpOnly: true,
-            secure: true,
-            sameSite: "None",
-            maxAge: 36000000,
-        });
-
-        res.redirect("auth/check-auth");
+        res.send(`
+            <script>
+              window.opener.postMessage({
+                type: 'oauth-success',
+                token: '${token}'
+              }, 'http://localhost:5173'); 
+              window.close();
+            </script>
+          `);
     } catch (error) {
         res.status(500).send("Authentication failed");
     }
 };
 
-export const checkAuth = async (req, res) => {
+export const setToken = async (req, res) => {
     try {
-        const token = req.cookies.token;
+        const { token } = req.body;
 
         if (!token) {
-            return res.status(401).json({ message: "Not authenticated" });
+            return res.status(401).json({ message: "Invalid token" });
         }
 
-        res.redirect(
-            `http://localhost:5173/?data=${encodeURIComponent(token)}`
-        );
+        res.cookie("auth-token", token);
+
+        res.send({ message: "cookies set successfully" });
     } catch (error) {
         res.status(401).json({ message: "Invalid token" });
     }

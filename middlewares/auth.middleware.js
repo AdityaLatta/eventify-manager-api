@@ -6,7 +6,9 @@ import { logger } from "../utils/winston.js";
 
 export async function isAuthenticated(req, res, next) {
     try {
-        const token = req.cookies.token;
+        const cookie = req.cookies;
+
+        const token = cookie["auth-token"];
 
         console.log(token);
 

@@ -1,9 +1,9 @@
 import { Router } from "express";
 import {
     auth,
-    checkAuth,
     login,
     logout,
+    setToken,
     updateDiscord,
 } from "../controllers/auth.controller.js";
 
@@ -13,7 +13,7 @@ router.post("/login", login);
 
 router.get("/", auth);
 
-router.get("/check-auth", checkAuth);
+router.post("/set-token", setToken);
 
 router.post("/logout", logout);
 
