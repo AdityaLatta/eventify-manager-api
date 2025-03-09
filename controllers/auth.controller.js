@@ -33,7 +33,7 @@ export const auth = async (req, res) => {
             maxAge: 36000000, // 10 hour expiration
         });
 
-        res.redirect("http://localhost:5173");
+        res.redirect("/events");
     } catch (error) {
         res.status(500).send("Authentication failed");
     }
