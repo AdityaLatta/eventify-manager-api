@@ -48,7 +48,12 @@ export const setToken = async (req, res) => {
             return res.status(401).json({ message: "Invalid token" });
         }
 
-        res.cookie("auth-token", token);
+        res.cookie("auth-token", token, {
+            httpOnly: true,
+            secure: true,
+            sameSite: "None",
+            maxAge: 36000000,
+        });
 
         res.send({ message: "cookies set successfully" });
     } catch (error) {
