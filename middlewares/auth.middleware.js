@@ -8,6 +8,8 @@ export async function isAuthenticated(req, res, next) {
     try {
         const token = req.cookies.token;
 
+        console.log(token);
+
         const decodedToken = jwt.verify(token, config.jwt.JWT_SECRET);
 
         const userId = decodedToken.userId;
