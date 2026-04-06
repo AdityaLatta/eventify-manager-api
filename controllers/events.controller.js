@@ -1,4 +1,6 @@
 import { createCalendarClient } from "../services/google/calendar.service.js";
+import { successResponse, errorResponse } from "../utils/response.js";
+import { logger } from "../utils/winston.js";
 
 export const getAllEvents = async (req, res) => {
     try {
@@ -19,9 +21,10 @@ export const getAllEvents = async (req, res) => {
             orderBy: "startTime",
         });
 
-        res.json(response.data.items);
+        successResponse(res, response.data.items);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        logger.error(`Error fetching events: ${error.message}`);
+        errorResponse(res, error.message, 500);
     }
 };
 
@@ -35,12 +38,13 @@ export const addEvent = async (req, res) => {
             resource: event,
         });
 
-        res.json({
+        successResponse(res, {
             message: "Event created successfully!",
             event: response.data,
         });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        logger.error(`Error adding event: ${error.message}`);
+        errorResponse(res, error.message, 500);
     }
 };
 
@@ -56,12 +60,13 @@ export const updateEvent = async (req, res) => {
             resource: updatedEvent,
         });
 
-        res.json({
+        successResponse(res, {
             message: "Event updated successfully!",
             event: response.data,
         });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        logger.error(`Error updating event: ${error.message}`);
+        errorResponse(res, error.message, 500);
     }
 };
 
@@ -75,8 +80,9 @@ export const deleteEvent = async (req, res) => {
             eventId: id,
         });
 
-        res.json({ message: "Event deleted successfully!" });
+        successResponse(res, { message: "Event deleted successfully!" });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        logger.error(`Error deleting event: ${error.message}`);
+        errorResponse(res, error.message, 500);
     }
 };

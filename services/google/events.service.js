@@ -2,13 +2,13 @@ import { google } from "googleapis";
 import { createCalendarClient } from "./calendar.service.js";
 import { Google } from "../../models/google.model.js";
 import { User } from "../../models/user.model.js";
-import { oauth2Client } from "./auth.service.js";
+import { logger } from "../../utils/winston.js";
 
 export async function getUpcomingEvents(user) {
     try {
         const googleAccount = await Google.findByPk(user.googleId);
         if (!googleAccount) {
-            console.error(`No Google account found for user ${user.email}`);
+            logger.error(`No Google account found for user ${user.email}`);
             return [];
         }
 
@@ -20,7 +20,6 @@ export async function getUpcomingEvents(user) {
         const timeMax = new Date(now.getTime() + 10 * 60 * 1000).toISOString();
 
         const res = await calendar.events.list({
-            auth: oauth2Client,
             calendarId: "primary",
             timeMin,
             timeMax,
@@ -30,7 +29,7 @@ export async function getUpcomingEvents(user) {
 
         return res.data.items || [];
     } catch (error) {
-        console.error(`Error fetching events for ${user.email}:`, error);
+        logger.error(`Error fetching events for ${user.email}: ${error.message}`);
         return [];
     }
 }
@@ -66,15 +65,15 @@ export async function subscribeToCalendar(userId, refreshToken) {
             { where: { id: user.googleId } }
         );
 
-        console.log("Subscribed to Google Calendar updates for user:");
+        logger.info(`Subscribed to Google Calendar updates for user: ${user.email}`);
     } catch (error) {
-        console.error("Error subscribing to calendar:", error);
+        logger.error(`Error subscribing to calendar: ${error.message}`);
     }
 }
 
 export async function fetchUpdatedEvents(resourceId) {
     try {
-        console.log("Updated Events-------");
+        logger.info("Fetching updated events...");
 
         const user = await Google.findOne({
             where: {
@@ -95,6 +94,6 @@ export async function fetchUpdatedEvents(resourceId) {
 
         return response.data.items;
     } catch (error) {
-        console.error("Error fetching updated events:", error);
+        logger.error(`Error fetching updated events: ${error.message}`);
     }
 }

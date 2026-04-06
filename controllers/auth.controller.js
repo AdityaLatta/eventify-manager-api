@@ -2,6 +2,8 @@ import { Discord } from "../models/discord.model.js";
 import { User } from "../models/user.model.js";
 import jwt from "jsonwebtoken";
 import { config } from "../config/index.js";
+import { successResponse, errorResponse } from "../utils/response.js";
+import { logger } from "../utils/winston.js";
 import {
     generateAuthUrl,
     getJwtToken,
@@ -16,7 +18,7 @@ import {
 
 export const login = (req, res) => {
     const url = generateAuthUrl();
-    res.json({ Message: "Please visit url below to login", url });
+    successResponse(res, { Message: "Please visit url below to login", url });
 };
 
 export const auth = async (req, res) => {
@@ -35,7 +37,7 @@ export const auth = async (req, res) => {
 
         const token = getJwtToken(payload);
 
-        res.json({ token });
+        successResponse(res, { token });
 
         // res.send(`
         //     <script>
@@ -47,7 +49,8 @@ export const auth = async (req, res) => {
         //     </script>
         //   `);
     } catch (error) {
-        res.status(500).send("Authentication failed");
+        logger.error(`Authentication failed: ${error.message}`);
+        errorResponse(res, "Authentication failed", 500);
     }
 };
 
@@ -56,7 +59,7 @@ export const setToken = async (req, res) => {
         const { token } = req.body;
 
         if (!token) {
-            return res.status(401).json({ message: "Invalid token" });
+            return errorResponse(res, "Invalid token", 401);
         }
         
         jwt.verify(token, config.jwt.JWT_SECRET);
@@ -68,14 +71,15 @@ export const setToken = async (req, res) => {
             maxAge: 36000000,
         });
 
-        res.send({ message: "cookies set successfully" });
+        successResponse(res, { message: "cookies set successfully" });
     } catch (error) {
-        res.status(401).json({ message: "Invalid token" });
+        logger.error(`Token validation error: ${error.message}`);
+        errorResponse(res, "Invalid token", 401);
     }
 };
 
 export const logout = (req, res) => {
-    res.send("To be done");
+    successResponse(res, { message: "To be done" });
 };
 
 export const updateDiscord = async (req, res) => {
@@ -85,7 +89,7 @@ export const updateDiscord = async (req, res) => {
     try {
         const user = await User.findByPk(userId);
 
-        if (!user) return res.status(404).json({ message: "User not found" });
+        if (!user) return errorResponse(res, "User not found", 404);
 
         // Check if Discord record exists
         let discordAccount = await Discord.findOne({
@@ -103,10 +107,10 @@ export const updateDiscord = async (req, res) => {
             await user.save();
         }
 
-        res.json({ message: "Discord ID updated successfully" });
+        successResponse(res, { message: "Discord ID updated successfully" });
     } catch (error) {
-        console.error("Error updating Discord ID:", error);
-        res.status(500).json({ message: "Server error" });
+        logger.error(`Error updating Discord ID: ${error.message}`);
+        errorResponse(res, "Server error", 500);
     }
 };
 
@@ -115,18 +119,18 @@ export const webhook = async (req, res) => {
         return res.sendStatus(403);
     }
     
-    console.log("Received Google Calendar Webhook Notification:", req.headers);
+    logger.info(`Received Google Calendar Webhook Notification for resource ${req.headers["x-goog-resource-id"]}`);
 
     // Google sends notifications when events are updated/deleted
     const resourceId = req.headers["x-goog-resource-id"];
     const resourceState = req.headers["x-goog-resource-state"];
 
     if (resourceState === "exists" || resourceState === "sync") {
-        console.log(`Calendar updated: ${resourceId}`);
+        logger.info(`Calendar updated: ${resourceId}`);
         // Fetch the updated events from Google Calendar
         const events = await fetchUpdatedEvents(resourceId);
 
-        console.log(events);
+        logger.info(`Fetched ${events ? events.length : 0} updated events`);
     }
 
     res.sendStatus(200); // Acknowledge receipt

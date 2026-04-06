@@ -1,13 +1,10 @@
 import { Client, GatewayIntentBits } from "discord.js";
-import dotenv from "dotenv";
 import cron from "node-cron";
 import { Op } from "sequelize";
 import { User } from "../../models/user.model.js";
 import { Discord } from "../../models/discord.model.js";
 import { getUpcomingEvents } from "../google/events.service.js";
 import { logger } from "../../utils/winston.js";
-
-dotenv.config();
 
 export const client = new Client({
     intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers],
