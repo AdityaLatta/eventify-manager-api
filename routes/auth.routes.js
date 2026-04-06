@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { isAuthenticated } from "../middlewares/auth.middleware.js";
 import {
     auth,
     login,
@@ -10,15 +11,13 @@ import {
 
 const router = Router();
 
-router.post("/login", login);
+router.get("/login", login);
 
 router.get("/", auth);
 
 router.post("/set-token", setToken);
 
 router.post("/logout", logout);
-
-import { isAuthenticated } from "../middlewares/auth.middleware.js";
 
 router.post("/update-discord", isAuthenticated, updateDiscord);
 

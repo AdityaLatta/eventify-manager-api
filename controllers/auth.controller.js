@@ -79,7 +79,12 @@ export const setToken = async (req, res) => {
 };
 
 export const logout = (req, res) => {
-    successResponse(res, { message: "To be done" });
+    res.clearCookie("auth-token", {
+        httpOnly: true,
+        secure: true,
+        sameSite: "None",
+    });
+    successResponse(res, { message: "Logged out successfully" });
 };
 
 export const updateDiscord = async (req, res) => {

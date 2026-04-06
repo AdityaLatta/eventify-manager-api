@@ -12,7 +12,7 @@ export const sequelize = new Sequelize(
         dialectOptions: {
             ssl: {
                 require: true,
-                rejectUnauthorized: false,
+                rejectUnauthorized: process.env.NODE_ENV === "production",
             },
         },
         logging: false,

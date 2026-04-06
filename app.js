@@ -9,6 +9,7 @@ import morgan from "morgan";
 import { logger } from "./utils/winston.js";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import rateLimit from "express-rate-limit";
 
 await connectDB();
 
@@ -42,6 +43,13 @@ app.use(
 
 app.use(cookieParser());
 app.use(morgan("dev"));
+
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // limit each IP to 100 requests per windowMs
+    message: { success: false, message: "Too many requests, please try again later." }
+});
+app.use(limiter);
 
 app.get("/health", (req, res) => res.json({ status: "ok" }));
 
