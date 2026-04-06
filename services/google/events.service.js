@@ -46,10 +46,11 @@ export async function subscribeToCalendar(userId, refreshToken) {
             requestBody: {
                 id: `channel-${Date.now()}`,
                 type: "webhook",
-                address: "https://authentic-lightweight-rrp-till.trycloudflare.com/auth/webhook",
+                address: process.env.WEBHOOK_URL,
                 params: {
                     ttl: 86400,
                 },
+                token: process.env.WEBHOOK_SECRET,
             },
         });
 

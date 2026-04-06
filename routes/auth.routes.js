@@ -18,7 +18,9 @@ router.post("/set-token", setToken);
 
 router.post("/logout", logout);
 
-router.post("/update-discord", updateDiscord);
+import { isAuthenticated } from "../middlewares/auth.middleware.js";
+
+router.post("/update-discord", isAuthenticated, updateDiscord);
 
 router.post("/webhook", webhook);
 

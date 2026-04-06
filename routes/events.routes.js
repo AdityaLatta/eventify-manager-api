@@ -11,9 +11,11 @@ const router = Router();
 
 router.use(isAuthenticated);
 
+import { validateEventBody } from "../middlewares/validation.middleware.js";
+
 router.get("/", getAllEvents);
-router.post("/", addEvent);
-router.put("/:id", updateEvent);
+router.post("/", validateEventBody, addEvent);
+router.put("/:id", validateEventBody, updateEvent);
 router.delete("/:id", deleteEvent);
 
 export default router;

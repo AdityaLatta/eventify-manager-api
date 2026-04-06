@@ -1,5 +1,7 @@
 import { Discord } from "../models/discord.model.js";
 import { User } from "../models/user.model.js";
+import jwt from "jsonwebtoken";
+import { config } from "../config/index.js";
 import {
     generateAuthUrl,
     getJwtToken,
@@ -21,7 +23,6 @@ export const auth = async (req, res) => {
     const { code } = req.query;
     try {
         const { tokens } = await oauth2Client.getToken(code);
-        console.log(tokens);
         oauth2Client.setCredentials(tokens);
 
         let { email } = await getUserProfile();
@@ -57,6 +58,8 @@ export const setToken = async (req, res) => {
         if (!token) {
             return res.status(401).json({ message: "Invalid token" });
         }
+        
+        jwt.verify(token, config.jwt.JWT_SECRET);
 
         res.cookie("auth-token", token, {
             httpOnly: true,
@@ -76,10 +79,11 @@ export const logout = (req, res) => {
 };
 
 export const updateDiscord = async (req, res) => {
-    const { email, discordId } = req.body;
+    const { discordId } = req.body;
+    const userId = req.userId;
 
     try {
-        const user = await User.findOne({ where: { email } });
+        const user = await User.findByPk(userId);
 
         if (!user) return res.status(404).json({ message: "User not found" });
 
@@ -107,6 +111,10 @@ export const updateDiscord = async (req, res) => {
 };
 
 export const webhook = async (req, res) => {
+    if (req.headers["x-goog-channel-token"] !== process.env.WEBHOOK_SECRET) {
+        return res.sendStatus(403);
+    }
+    
     console.log("Received Google Calendar Webhook Notification:", req.headers);
 
     // Google sends notifications when events are updated/deleted
