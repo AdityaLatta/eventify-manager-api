@@ -1,5 +1,5 @@
 import { google } from "googleapis";
-import { calendar } from "../../controllers/events.controller.js";
+import { createCalendarClient } from "./calendar.service.js";
 import { Google } from "../../models/google.model.js";
 import { User } from "../../models/user.model.js";
 import { oauth2Client } from "./auth.service.js";
@@ -11,7 +11,9 @@ export async function getUpcomingEvents(user) {
             console.error(`No Google account found for user ${user.email}`);
             return [];
         }
-        oauth2Client.setCredentials({ refresh_token: googleAccount.refreshToken });
+
+
+        const calendar = createCalendarClient(googleAccount.refreshToken);
 
         const now = new Date();
         const timeMin = new Date(now.getTime() + 5 * 60 * 1000).toISOString();
@@ -35,7 +37,9 @@ export async function getUpcomingEvents(user) {
 
 export async function subscribeToCalendar(userId, refreshToken) {
     try {
-        oauth2Client.setCredentials({ refresh_token: refreshToken });
+
+
+        const calendar = createCalendarClient(refreshToken);
 
         const response = await calendar.events.watch({
             calendarId: "primary",
@@ -77,7 +81,9 @@ export async function fetchUpdatedEvents(resourceId) {
             },
         });
 
-        oauth2Client.setCredentials({ refresh_token: user.refreshToken });
+
+
+        const calendar = createCalendarClient(user.refreshToken);
 
         const response = await calendar.events.list({
             calendarId: "primary",

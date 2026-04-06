@@ -76,4 +76,4 @@ function getJwtToken(payload) {
     return jwt.sign(payload, config.jwt.JWT_SECRET, { expiresIn: "1d" });
 }
 
-export { generateAuthUrl, getJwtToken, getUserProfile, oauth2Client, saveUser };
+export { generateAuthUrl, getJwtToken, getUserProfile, saveUser, oauth2Client };

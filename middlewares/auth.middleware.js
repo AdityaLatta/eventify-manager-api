@@ -32,10 +32,8 @@ export async function isAuthenticated(req, res, next) {
                 .status(404)
                 .json({ message: "Google account not found" });
 
-        oauth2Client.setCredentials({
-            refresh_token: googleAccount.refreshToken,
-        });
-
+        req.googleRefreshToken = googleAccount.refreshToken;
+        req.userId = userId;
         next();
     } catch (error) {
         logger.error(error.message);

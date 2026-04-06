@@ -1,10 +1,9 @@
-import { google } from "googleapis";
-import { oauth2Client } from "../services/google/auth.service.js";
-
-export const calendar = google.calendar({ version: "v3", auth: oauth2Client });
+import { createCalendarClient } from "../services/google/calendar.service.js";
 
 export const getAllEvents = async (req, res) => {
     try {
+        const calendar = createCalendarClient(req.googleRefreshToken);
+
         const today = new Date();
         const tomorrow = new Date();
         tomorrow.setDate(today.getDate() + 1);
@@ -30,6 +29,7 @@ export const addEvent = async (req, res) => {
     const event = req.body;
 
     try {
+        const calendar = createCalendarClient(req.googleRefreshToken);
         const response = await calendar.events.insert({
             calendarId: "primary",
             resource: event,
@@ -49,6 +49,7 @@ export const updateEvent = async (req, res) => {
     const updatedEvent = req.body;
 
     try {
+        const calendar = createCalendarClient(req.googleRefreshToken);
         const response = await calendar.events.update({
             calendarId: "primary",
             eventId: id,
@@ -68,6 +69,7 @@ export const deleteEvent = async (req, res) => {
     const { id } = req.params;
 
     try {
+        const calendar = createCalendarClient(req.googleRefreshToken);
         await calendar.events.delete({
             calendarId: "primary",
             eventId: id,
