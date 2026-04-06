@@ -1,5 +1,7 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../services/Database/database.js";
+import { Google } from "./google.model.js";
+import { Discord } from "./discord.model.js";
 
 export const User = sequelize.define(
     "User",
@@ -14,13 +16,21 @@ export const User = sequelize.define(
             allowNull: false,
             unique: true,
         },
-        googleRefreshToken: {
-            type: DataTypes.STRING,
+        googleId: {
+            type: DataTypes.UUID,
             allowNull: false,
+            references: {
+                model: "Googles",
+                key: "id",
+            },
         },
         discordId: {
-            type: DataTypes.STRING,
+            type: DataTypes.UUID,
             allowNull: true,
+            references: {
+                model: "Discords",
+                key: "id",
+            },
         },
     },
     {

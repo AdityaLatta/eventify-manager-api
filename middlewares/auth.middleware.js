@@ -1,4 +1,5 @@
 import { config } from "../config/index.js";
+import { Google } from "../models/google.model.js";
 import { User } from "../models/user.model.js";
 import { oauth2Client } from "../services/google/auth.service.js";
 import jwt from "jsonwebtoken";
@@ -9,8 +10,6 @@ export async function isAuthenticated(req, res, next) {
         const cookie = req.cookies;
 
         const token = cookie["auth-token"];
-
-        console.log(token);
 
         const decodedToken = jwt.verify(token, config.jwt.JWT_SECRET);
 
@@ -26,7 +25,16 @@ export async function isAuthenticated(req, res, next) {
 
         if (!user) return res.status(404).json({ message: "User not found" });
 
-        oauth2Client.setCredentials({ refresh_token: user.googleRefreshToken });
+        const googleAccount = await Google.findByPk(user.googleId);
+
+        if (!googleAccount)
+            return res
+                .status(404)
+                .json({ message: "Google account not found" });
+
+        oauth2Client.setCredentials({
+            refresh_token: googleAccount.refreshToken,
+        });
 
         next();
     } catch (error) {
