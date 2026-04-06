@@ -9,12 +9,18 @@ import { logger } from "./utils/winston.js";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 
-connectDB();
+await connectDB();
 
-sequelize
-    .sync({ alter: true })
-    .then(() => logger.info("Database synced!"))
-    .catch((err) => logger.error(`Error syncing database: ${err}`));
+if (process.env.NODE_ENV !== "production") {
+    try {
+        await sequelize.sync({ alter: true });
+        logger.info("Database synced!");
+    } catch (err) {
+        logger.error(`Error syncing database: ${err}`);
+    }
+} else {
+    logger.info("Skipping database sync in production. Ensure migrations are applied.");
+}
 
 client.login(config.discord.DISCORD_BOT_TOKEN);
 
@@ -34,6 +40,8 @@ app.use(
 
 app.use(cookieParser());
 app.use(morgan("dev"));
+
+app.get("/health", (req, res) => res.json({ status: "ok" }));
 
 app.use("/auth", authRoutes);
 app.use("/events", eventsRoutes);
