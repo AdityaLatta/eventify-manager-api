@@ -3,6 +3,7 @@ import { config } from "./config/index.js";
 import authRoutes from "./routes/auth.routes.js";
 import eventsRoutes from "./routes/events.routes.js";
 import { client } from "./services/discord/discordBot.js";
+import { startWebhookRenewalCron } from "./services/google/webhook.service.js";
 import { sequelize, connectDB } from "./services/Database/database.js";
 import morgan from "morgan";
 import { logger } from "./utils/winston.js";
@@ -23,6 +24,7 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 client.login(config.discord.DISCORD_BOT_TOKEN);
+startWebhookRenewalCron();
 
 const port = config.port || 3000;
 

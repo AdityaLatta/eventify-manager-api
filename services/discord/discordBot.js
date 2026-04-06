@@ -1,6 +1,7 @@
 import { Client, GatewayIntentBits } from "discord.js";
 import dotenv from "dotenv";
 import cron from "node-cron";
+import { Op } from "sequelize";
 import { User } from "../../models/user.model.js";
 import { Discord } from "../../models/discord.model.js";
 import { getUpcomingEvents } from "../google/events.service.js";
@@ -11,6 +12,11 @@ dotenv.config();
 export const client = new Client({
     intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers],
 });
+
+const sentReminders = new Set();
+
+// Clear the sent reminders cache every hour to prevent memory leak
+setInterval(() => sentReminders.clear(), 60 * 60 * 1000);
 
 client.once("ready", async () => {
     logger.info(`Logged in as ${client.user.tag}!`);
@@ -41,7 +47,9 @@ async function sendReminder(user, message) {
 }
 
 async function scheduleReminders() {
-    const users = await User.findAll();
+    const users = await User.findAll({
+        where: { discordId: { [Op.ne]: null } }
+    });
     const now = new Date();
 
     for (const user of users) {
@@ -51,8 +59,12 @@ async function scheduleReminders() {
             const eventStart = new Date(event.start.dateTime);
             const minutesToEvent = Math.floor((eventStart - now) / 60000);
 
-            if (minutesToEvent === 5) {
-                await sendReminder(user, event.summary);
+            if (minutesToEvent >= 4 && minutesToEvent <= 6) {
+                const key = `${event.id}:${user.id}`;
+                if (!sentReminders.has(key)) {
+                    await sendReminder(user, event.summary);
+                    sentReminders.add(key);
+                }
             }
         }
     }
