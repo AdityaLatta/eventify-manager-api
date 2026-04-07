@@ -1,5 +1,5 @@
 import { createCalendarClient, PRIMARY_CALENDAR } from "../services/google/calendar.service.js";
-import { successResponse } from "../utils/response.js";
+import { successResponse, errorResponse } from "../utils/response.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
 export const getAllEvents = asyncHandler(async (req, res) => {
@@ -42,6 +42,10 @@ export const updateEvent = asyncHandler(async (req, res) => {
     const { id } = req.params;
     const updatedEvent = req.body;
 
+    if (!id || typeof id !== "string" || !/^[\w-]+$/.test(id)) {
+        return errorResponse(res, "Invalid event ID format", 400);
+    }
+
     const calendar = createCalendarClient(req.googleRefreshToken);
     const response = await calendar.events.update({
         calendarId: PRIMARY_CALENDAR,
@@ -57,6 +61,10 @@ export const updateEvent = asyncHandler(async (req, res) => {
 
 export const deleteEvent = asyncHandler(async (req, res) => {
     const { id } = req.params;
+
+    if (!id || typeof id !== "string" || !/^[\w-]+$/.test(id)) {
+        return errorResponse(res, "Invalid event ID format", 400);
+    }
 
     const calendar = createCalendarClient(req.googleRefreshToken);
     await calendar.events.delete({

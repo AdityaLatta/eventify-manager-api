@@ -1,6 +1,7 @@
 import { Google, User } from "../../models/index.js";
 import { logger } from "../../utils/winston.js";
 import { createCalendarClient, PRIMARY_CALENDAR } from "./calendar.service.js";
+import { config } from "../../config/index.js";
 
 export async function getUpcomingEvents(user) {
     try {
@@ -40,11 +41,11 @@ export async function subscribeToCalendar(userId, refreshToken) {
             requestBody: {
                 id: `channel-${Date.now()}`,
                 type: "webhook",
-                address: process.env.WEBHOOK_URL,
+                address: config.google.webhook.url,
                 params: {
                     ttl: 86400,
                 },
-                token: process.env.WEBHOOK_SECRET,
+                token: config.google.webhook.secret,
             },
         });
 

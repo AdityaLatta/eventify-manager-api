@@ -77,6 +77,10 @@ export const updateDiscord = asyncHandler(async (req, res) => {
     const { discordId } = req.body;
     const userId = req.userId;
 
+    if (!discordId || typeof discordId !== "string" || !/^\d{17,20}$/.test(discordId)) {
+        return errorResponse(res, "Invalid discordId format", 400);
+    }
+
     const user = await User.findByPk(userId);
 
     if (!user) return errorResponse(res, "User not found", 404);
@@ -101,7 +105,7 @@ export const updateDiscord = asyncHandler(async (req, res) => {
 });
 
 export const webhook = asyncHandler(async (req, res) => {
-    if (req.headers["x-goog-channel-token"] !== process.env.WEBHOOK_SECRET) {
+    if (req.headers["x-goog-channel-token"] !== config.google.webhook.secret) {
         return res.sendStatus(403);
     }
 

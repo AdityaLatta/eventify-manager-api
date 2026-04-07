@@ -15,7 +15,7 @@ export async function isAuthenticated(req, res, next) {
         const userId = decodedToken.userId;
 
         if (!userId) {
-            return errorResponse(res, "Invalid token: Email not found", 400);
+            return errorResponse(res, "Invalid token: Email not found", 401);
         }
 
         const user = await User.findByPk(userId, { include: [Google] });
@@ -31,6 +31,6 @@ export async function isAuthenticated(req, res, next) {
         next();
     } catch (error) {
         logger.error(error.message);
-        errorResponse(res, "User not authenticated", 500);
+        errorResponse(res, "User not authenticated", 401);
     }
 }

@@ -16,6 +16,10 @@ export const config = {
             redirect_uris: process.env.REDIRECT_URIS,
             javascript_origins: process.env.JAVASCRIPT_ORIGINS,
         },
+        webhook: {
+            url: process.env.WEBHOOK_URL,
+            secret: process.env.WEBHOOK_SECRET,
+        },
     },
 
     discord: {
