@@ -29,42 +29,37 @@ export const getUserProfile = async () => {
 };
 
 export async function saveUser(email, googleRefreshToken) {
-    try {
-        let user = await User.findOne({ where: { email } });
+    let user = await User.findOne({ where: { email } });
 
-        if (user) {
-            // Check if a Google record exists for the user
-            let googleAccount = await Google.findOne({
-                where: { id: user.googleId },
-            });
+    if (user) {
+        // Check if a Google record exists for the user
+        let googleAccount = await Google.findOne({
+            where: { id: user.googleId },
+        });
 
-            if (googleAccount) {
-                // Update the refresh token
-                googleAccount.refreshToken = googleRefreshToken;
-                await googleAccount.save();
-            } else {
-                // Create new Google record and link it to the User
-                googleAccount = await Google.create({
-                    refreshToken: googleRefreshToken,
-                });
-                user.googleId = googleAccount.id;
-                await user.save();
-            }
+        if (googleAccount) {
+            // Update the refresh token
+            googleAccount.refreshToken = googleRefreshToken;
+            await googleAccount.save();
         } else {
-            // Create a new Google record first
-            const googleAccount = await Google.create({
+            // Create new Google record and link it to the User
+            googleAccount = await Google.create({
                 refreshToken: googleRefreshToken,
             });
-
-            // Create a new User and link it to Google
-            user = await User.create({ email, googleId: googleAccount.id });
+            user.googleId = googleAccount.id;
+            await user.save();
         }
+    } else {
+        // Create a new Google record first
+        const googleAccount = await Google.create({
+            refreshToken: googleRefreshToken,
+        });
 
-        return user;
-    } catch (error) {
-        logger.error(`Error saving user: ${error.message}`);
-        throw error;
+        // Create a new User and link it to Google
+        user = await User.create({ email, googleId: googleAccount.id });
     }
+
+    return user;
 }
 
 export function getJwtToken(payload) {
