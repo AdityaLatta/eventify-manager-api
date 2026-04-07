@@ -30,6 +30,8 @@ startWebhookRenewalCron();
 const port = config.port || 3000;
 
 const app = express();
+app.set('trust proxy', 1);
+
 app.use(express.json());
 
 const allowedOrigins = ["https://eventify.vercel.app", "http://localhost:5173"];
