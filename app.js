@@ -1,15 +1,15 @@
+import cookieParser from "cookie-parser";
+import cors from "cors";
 import express from "express";
+import rateLimit from "express-rate-limit";
+import morgan from "morgan";
 import { config } from "./config/index.js";
 import authRoutes from "./routes/auth.routes.js";
 import eventsRoutes from "./routes/events.routes.js";
+import { connectDB, sequelize } from "./services/Database/database.js";
 import { client } from "./services/discord/discordBot.js";
 import { startWebhookRenewalCron } from "./services/google/webhook.service.js";
-import { sequelize, connectDB } from "./services/Database/database.js";
-import morgan from "morgan";
 import { logger } from "./utils/winston.js";
-import cors from "cors";
-import cookieParser from "cookie-parser";
-import rateLimit from "express-rate-limit";
 
 await connectDB();
 

@@ -1,5 +1,4 @@
 import { Router } from "express";
-import { isAuthenticated } from "../middlewares/auth.middleware.js";
 import {
     auth,
     login,
@@ -8,6 +7,7 @@ import {
     updateDiscord,
     webhook,
 } from "../controllers/auth.controller.js";
+import { isAuthenticated } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 

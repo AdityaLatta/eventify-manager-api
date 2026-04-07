@@ -1,9 +1,9 @@
 import { Client, GatewayIntentBits } from "discord.js";
 import cron from "node-cron";
 import { Op } from "sequelize";
-import { User, Discord } from "../../models/index.js";
-import { getUpcomingEvents } from "../google/events.service.js";
+import { Discord, User } from "../../models/index.js";
 import { logger } from "../../utils/winston.js";
+import { getUpcomingEvents } from "../google/events.service.js";
 
 export const client = new Client({
     intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers],

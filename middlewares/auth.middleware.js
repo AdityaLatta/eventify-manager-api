@@ -1,9 +1,8 @@
+import jwt from "jsonwebtoken";
 import { config } from "../config/index.js";
 import { Google, User } from "../models/index.js";
-import { oauth2Client } from "../services/google/auth.service.js";
-import jwt from "jsonwebtoken";
-import { logger } from "../utils/winston.js";
 import { errorResponse } from "../utils/response.js";
+import { logger } from "../utils/winston.js";
 
 export async function isAuthenticated(req, res, next) {
     try {

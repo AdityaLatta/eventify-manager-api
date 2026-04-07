@@ -1,8 +1,6 @@
-import { Discord, User } from "../models/index.js";
 import jwt from "jsonwebtoken";
 import { config } from "../config/index.js";
-import { successResponse, errorResponse } from "../utils/response.js";
-import { logger } from "../utils/winston.js";
+import { Discord, User } from "../models/index.js";
 import {
     generateAuthUrl,
     getJwtToken,
@@ -14,6 +12,8 @@ import {
     fetchUpdatedEvents,
     subscribeToCalendar,
 } from "../services/google/events.service.js";
+import { errorResponse, successResponse } from "../utils/response.js";
+import { logger } from "../utils/winston.js";
 
 export const login = (req, res) => {
     const url = generateAuthUrl();
@@ -60,7 +60,7 @@ export const setToken = async (req, res) => {
         if (!token) {
             return errorResponse(res, "Invalid token", 401);
         }
-        
+
         jwt.verify(token, config.jwt.JWT_SECRET);
 
         res.cookie("auth-token", token, {
@@ -122,7 +122,7 @@ export const webhook = async (req, res) => {
     if (req.headers["x-goog-channel-token"] !== process.env.WEBHOOK_SECRET) {
         return res.sendStatus(403);
     }
-    
+
     logger.info(`Received Google Calendar Webhook Notification for resource ${req.headers["x-goog-resource-id"]}`);
 
     // Google sends notifications when events are updated/deleted

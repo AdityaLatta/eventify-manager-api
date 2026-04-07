@@ -1,7 +1,5 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../services/Database/database.js";
-import { Google } from "./google.model.js";
-import { Discord } from "./discord.model.js";
 
 export const User = sequelize.define(
     "User",
