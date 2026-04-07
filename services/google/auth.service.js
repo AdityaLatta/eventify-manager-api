@@ -5,13 +5,13 @@ import { Google, User } from "../../models/index.js";
 
 const { client_id, client_secret, redirect_uris } = config.google.web;
 
-const oauth2Client = new google.auth.OAuth2(
+export const oauth2Client = new google.auth.OAuth2(
     client_id,
     client_secret,
-    redirect_uris
+    redirect_uris,
 );
 
-const generateAuthUrl = () => {
+export const generateAuthUrl = () => {
     const url = oauth2Client.generateAuthUrl({
         access_type: "offline",
         prompt: "consent",
@@ -26,13 +26,13 @@ const generateAuthUrl = () => {
     return url;
 };
 
-const getUserProfile = async () => {
+export const getUserProfile = async () => {
     const oauth2 = google.oauth2({ version: "v2", auth: oauth2Client });
     const userInfo = await oauth2.userinfo.get();
     return userInfo.data;
 };
 
-async function saveUser(email, googleRefreshToken) {
+export async function saveUser(email, googleRefreshToken) {
     try {
         let user = await User.findOne({ where: { email } });
 
@@ -71,8 +71,6 @@ async function saveUser(email, googleRefreshToken) {
     }
 }
 
-function getJwtToken(payload) {
+export function getJwtToken(payload) {
     return jwt.sign(payload, config.jwt.JWT_SECRET, { expiresIn: "1d" });
 }
-
-export { generateAuthUrl, getJwtToken, getUserProfile, saveUser, oauth2Client };

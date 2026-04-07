@@ -37,16 +37,6 @@ export const auth = async (req, res) => {
         const token = getJwtToken(payload);
 
         successResponse(res, { token });
-
-        // res.send(`
-        //     <script>
-        //       window.opener.postMessage({
-        //         type: 'oauth-success',
-        //         token: '${token}'
-        //       }, 'http://localhost:5173'); 
-        //       window.close();
-        //     </script>
-        //   `);
     } catch (error) {
         logger.error(`Authentication failed: ${error.message}`);
         errorResponse(res, "Authentication failed", 500);
