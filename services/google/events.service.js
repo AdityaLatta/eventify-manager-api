@@ -1,7 +1,6 @@
-import { google } from "googleapis";
-import { createCalendarClient } from "./calendar.service.js";
 import { Google, User } from "../../models/index.js";
 import { logger } from "../../utils/winston.js";
+import { createCalendarClient } from "./calendar.service.js";
 
 export async function getUpcomingEvents(user) {
     try {
@@ -10,7 +9,6 @@ export async function getUpcomingEvents(user) {
             logger.error(`No Google account found for user ${user.email}`);
             return [];
         }
-
 
         const calendar = createCalendarClient(googleAccount.refreshToken);
 
