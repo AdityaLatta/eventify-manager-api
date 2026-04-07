@@ -2,14 +2,9 @@ import { google } from "googleapis";
 import jwt from "jsonwebtoken";
 import { config } from "../../config/index.js";
 import { Google, User } from "../../models/index.js";
+import { createOAuth2Client } from "./calendar.service.js";
 
-const { client_id, client_secret, redirect_uris } = config.google.web;
-
-export const oauth2Client = new google.auth.OAuth2(
-    client_id,
-    client_secret,
-    redirect_uris,
-);
+export const oauth2Client = createOAuth2Client();
 
 export const generateAuthUrl = () => {
     const url = oauth2Client.generateAuthUrl({

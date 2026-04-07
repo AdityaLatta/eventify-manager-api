@@ -13,6 +13,7 @@ import {
     subscribeToCalendar,
 } from "../services/google/events.service.js";
 import { errorResponse, successResponse } from "../utils/response.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 import { logger } from "../utils/winston.js";
 
 export const login = (req, res) => {
@@ -20,95 +21,86 @@ export const login = (req, res) => {
     successResponse(res, { Message: "Please visit url below to login", url });
 };
 
-export const auth = async (req, res) => {
+export const auth = asyncHandler(async (req, res) => {
     const { code } = req.query;
-    try {
-        const { tokens } = await oauth2Client.getToken(code);
-        oauth2Client.setCredentials(tokens);
 
-        let { email } = await getUserProfile();
+    const { tokens } = await oauth2Client.getToken(code);
+    oauth2Client.setCredentials(tokens);
 
-        const user = await saveUser(email, tokens.refresh_token);
+    let { email } = await getUserProfile();
 
-        await subscribeToCalendar(user.id, tokens.refresh_token);
+    const user = await saveUser(email, tokens.refresh_token);
 
-        const payload = { userId: user.id };
+    await subscribeToCalendar(user.id, tokens.refresh_token);
 
-        const token = getJwtToken(payload);
+    const payload = { userId: user.id };
 
-        successResponse(res, { token });
-    } catch (error) {
-        logger.error(`Authentication failed: ${error.message}`);
-        errorResponse(res, "Authentication failed", 500);
+    const token = getJwtToken(payload);
+
+    successResponse(res, { token });
+});
+
+export const setToken = asyncHandler(async (req, res) => {
+    const { token } = req.body;
+
+    if (!token) {
+        return errorResponse(res, "Invalid token", 401);
     }
-};
 
-export const setToken = async (req, res) => {
     try {
-        const { token } = req.body;
-
-        if (!token) {
-            return errorResponse(res, "Invalid token", 401);
-        }
-
         jwt.verify(token, config.jwt.JWT_SECRET);
-
-        res.cookie("auth-token", token, {
-            httpOnly: true,
-            secure: true,
-            sameSite: "None",
-            maxAge: 36000000,
-        });
-
-        successResponse(res, { message: "cookies set successfully" });
     } catch (error) {
         logger.error(`Token validation error: ${error.message}`);
-        errorResponse(res, "Invalid token", 401);
+        return errorResponse(res, "Invalid token", 401);
     }
-};
 
-export const logout = (req, res) => {
+    res.cookie("auth-token", token, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "None",
+        maxAge: 36000000,
+    });
+
+    successResponse(res, { message: "cookies set successfully" });
+});
+
+export const logout = asyncHandler(async (req, res) => {
     res.clearCookie("auth-token", {
         httpOnly: true,
         secure: true,
         sameSite: "None",
     });
     successResponse(res, { message: "Logged out successfully" });
-};
+});
 
-export const updateDiscord = async (req, res) => {
+export const updateDiscord = asyncHandler(async (req, res) => {
     const { discordId } = req.body;
     const userId = req.userId;
 
-    try {
-        const user = await User.findByPk(userId);
+    const user = await User.findByPk(userId);
 
-        if (!user) return errorResponse(res, "User not found", 404);
+    if (!user) return errorResponse(res, "User not found", 404);
 
-        // Check if Discord record exists
-        let discordAccount = await Discord.findOne({
-            where: { id: user.discordId },
-        });
+    // Check if Discord record exists
+    let discordAccount = await Discord.findOne({
+        where: { id: user.discordId },
+    });
 
-        if (discordAccount) {
-            // Update existing Discord record
-            discordAccount.discordId = discordId;
-            await discordAccount.save();
-        } else {
-            // Create new Discord record and link to User
-            discordAccount = await Discord.create({ discordId });
-            user.discordId = discordAccount.id;
-            await user.save();
-        }
-
-        successResponse(res, { message: "Discord ID updated successfully" });
-    } catch (error) {
-        logger.error(`Error updating Discord ID: ${error.message}`);
-        errorResponse(res, "Server error", 500);
+    if (discordAccount) {
+        // Update existing Discord record
+        discordAccount.discordId = discordId;
+        await discordAccount.save();
+    } else {
+        // Create new Discord record and link to User
+        discordAccount = await Discord.create({ discordId });
+        user.discordId = discordAccount.id;
+        await user.save();
     }
-};
 
-export const webhook = async (req, res) => {
+    successResponse(res, { message: "Discord ID updated successfully" });
+});
+
+export const webhook = asyncHandler(async (req, res) => {
     if (req.headers["x-goog-channel-token"] !== process.env.WEBHOOK_SECRET) {
         return res.sendStatus(403);
     }
@@ -128,4 +120,4 @@ export const webhook = async (req, res) => {
     }
 
     res.sendStatus(200); // Acknowledge receipt
-};
+});

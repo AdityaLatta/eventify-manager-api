@@ -1,6 +1,6 @@
 import { Google, User } from "../../models/index.js";
 import { logger } from "../../utils/winston.js";
-import { createCalendarClient } from "./calendar.service.js";
+import { createCalendarClient, PRIMARY_CALENDAR } from "./calendar.service.js";
 
 export async function getUpcomingEvents(user) {
     try {
@@ -17,7 +17,7 @@ export async function getUpcomingEvents(user) {
         const timeMax = new Date(now.getTime() + 10 * 60 * 1000).toISOString();
 
         const res = await calendar.events.list({
-            calendarId: "primary",
+            calendarId: PRIMARY_CALENDAR,
             timeMin,
             timeMax,
             singleEvents: true,
@@ -36,7 +36,7 @@ export async function subscribeToCalendar(userId, refreshToken) {
         const calendar = createCalendarClient(refreshToken);
 
         const response = await calendar.events.watch({
-            calendarId: "primary",
+            calendarId: PRIMARY_CALENDAR,
             requestBody: {
                 id: `channel-${Date.now()}`,
                 type: "webhook",
@@ -81,7 +81,7 @@ export async function fetchUpdatedEvents(resourceId) {
         const calendar = createCalendarClient(user.refreshToken);
 
         const response = await calendar.events.list({
-            calendarId: "primary",
+            calendarId: PRIMARY_CALENDAR,
             maxResults: 10,
             singleEvents: true,
             orderBy: "startTime",
