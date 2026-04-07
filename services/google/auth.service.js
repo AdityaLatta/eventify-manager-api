@@ -2,6 +2,7 @@ import { google } from "googleapis";
 import jwt from "jsonwebtoken";
 import { config } from "../../config/index.js";
 import { Google, User } from "../../models/index.js";
+import { logger } from "../../utils/winston.js";
 import { createOAuth2Client } from "./calendar.service.js";
 
 export const oauth2Client = createOAuth2Client();
@@ -61,7 +62,7 @@ export async function saveUser(email, googleRefreshToken) {
 
         return user;
     } catch (error) {
-        console.error("Error saving user:", error);
+        logger.error(`Error saving user: ${error.message}`);
         throw error;
     }
 }

@@ -37,8 +37,12 @@ async function sendReminder(user, message) {
     const discordUser = await client.users.fetch(discordAccount.discordId);
 
     if (discordUser) {
-        await discordUser.send(`Reminder: ${message} starts in 5 minutes!`);
-        logger.info(`Message sent to ${discordUser.tag}`);
+        try {
+            await discordUser.send(`Reminder: ${message} starts in 5 minutes!`);
+            logger.info(`Message sent to ${discordUser.tag}`);
+        } catch (error) {
+            logger.error(`Failed to send Discord DM to ${discordUser.tag}: ${error.message}`);
+        }
     }
 }
 

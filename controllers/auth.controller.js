@@ -118,9 +118,12 @@ export const webhook = asyncHandler(async (req, res) => {
     if (resourceState === "exists" || resourceState === "sync") {
         logger.info(`Calendar updated: ${resourceId}`);
         // Fetch the updated events from Google Calendar
-        const events = await fetchUpdatedEvents(resourceId);
-
-        logger.info(`Fetched ${events ? events.length : 0} updated events`);
+        try {
+            const events = await fetchUpdatedEvents(resourceId);
+            logger.info(`Fetched ${events ? events.length : 0} updated events`);
+        } catch (error) {
+            logger.error(`Error handling webhook events: ${error.message}`);
+        }
     }
 
     res.sendStatus(200); // Acknowledge receipt

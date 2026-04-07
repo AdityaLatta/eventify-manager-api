@@ -1,6 +1,6 @@
 import cron from "node-cron";
 import { Op } from "sequelize";
-import { Google } from "../../models/index.js";
+import { Google, User } from "../../models/index.js";
 import { subscribeToCalendar } from "./events.service.js";
 import { logger } from "../../utils/winston.js";
 
@@ -15,10 +15,11 @@ export const startWebhookRenewalCron = () => {
             [Op.lt]: new Date(Date.now() + 2 * 60 * 60 * 1000),
           },
         },
+        include: [User],
       });
 
       for (const account of expiring) {
-        const user = await account.getUser();
+        const user = account.User;
         if (user) {
           logger.info(`Renewing webhook for user ${user.email}`);
           await subscribeToCalendar(user.id, account.refreshToken);

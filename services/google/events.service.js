@@ -91,5 +91,6 @@ export async function fetchUpdatedEvents(resourceId) {
         return response.data.items;
     } catch (error) {
         logger.error(`Error fetching updated events: ${error.message}`);
+        return [];
     }
 }
