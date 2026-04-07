@@ -1,6 +1,5 @@
 import { config } from "../config/index.js";
-import { Google } from "../models/google.model.js";
-import { User } from "../models/user.model.js";
+import { Google, User } from "../models/index.js";
 import { oauth2Client } from "../services/google/auth.service.js";
 import jwt from "jsonwebtoken";
 import { logger } from "../utils/winston.js";

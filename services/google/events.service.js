@@ -1,7 +1,6 @@
 import { google } from "googleapis";
 import { createCalendarClient } from "./calendar.service.js";
-import { Google } from "../../models/google.model.js";
-import { User } from "../../models/user.model.js";
+import { Google, User } from "../../models/index.js";
 import { logger } from "../../utils/winston.js";
 
 export async function getUpcomingEvents(user) {

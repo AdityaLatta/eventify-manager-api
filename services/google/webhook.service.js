@@ -1,6 +1,6 @@
 import cron from "node-cron";
 import { Op } from "sequelize";
-import { Google } from "../../models/google.model.js";
+import { Google } from "../../models/index.js";
 import { subscribeToCalendar } from "./events.service.js";
 import { logger } from "../../utils/winston.js";
 

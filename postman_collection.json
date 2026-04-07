@@ -1,0 +1,219 @@
+{
+  "info": {
+    "name": "Eventify Manager API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/health",
+          "host": ["{{baseUrl}}"],
+          "path": ["health"]
+        }
+      }
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Auth Callback",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/auth/?code=oauth2_code_here",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", ""],
+              "query": [
+                {
+                  "key": "code",
+                  "value": "oauth2_code_here"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Set Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"token\": \"your_jwt_token_here\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/set-token",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "set-token"]
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/auth/logout",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "logout"]
+            }
+          }
+        },
+        {
+          "name": "Update Discord",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"discordId\": \"your_discord_user_id\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/update-discord",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "update-discord"]
+            }
+          }
+        },
+        {
+          "name": "Webhook Notification (Google)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "x-goog-channel-token",
+                "value": "your_webhook_secret"
+              },
+              {
+                "key": "x-goog-resource-id",
+                "value": "resource_id"
+              },
+              {
+                "key": "x-goog-resource-state",
+                "value": "sync"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/webhook",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "webhook"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Events",
+      "item": [
+        {
+          "name": "Get All Events",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/events/",
+              "host": ["{{baseUrl}}"],
+              "path": ["events", ""]
+            }
+          }
+        },
+        {
+          "name": "Add Event",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"summary\": \"Meeting with Team\",\n    \"start\": {\n        \"dateTime\": \"2026-04-08T10:00:00Z\"\n    },\n    \"end\": {\n        \"dateTime\": \"2026-04-08T11:00:00Z\"\n    }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/events/",
+              "host": ["{{baseUrl}}"],
+              "path": ["events", ""]
+            }
+          }
+        },
+        {
+          "name": "Update Event",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"summary\": \"Updated Meeting\",\n    \"start\": {\n        \"dateTime\": \"2026-04-08T10:00:00Z\"\n    },\n    \"end\": {\n        \"dateTime\": \"2026-04-08T11:00:00Z\"\n    }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/events/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["events", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "event_id_here"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Event",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/events/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["events", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "event_id_here"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    }
+  ]
+}

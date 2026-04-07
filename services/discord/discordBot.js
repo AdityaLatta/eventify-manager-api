@@ -1,8 +1,7 @@
 import { Client, GatewayIntentBits } from "discord.js";
 import cron from "node-cron";
 import { Op } from "sequelize";
-import { User } from "../../models/user.model.js";
-import { Discord } from "../../models/discord.model.js";
+import { User, Discord } from "../../models/index.js";
 import { getUpcomingEvents } from "../google/events.service.js";
 import { logger } from "../../utils/winston.js";
 

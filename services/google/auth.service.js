@@ -1,8 +1,7 @@
 import { google } from "googleapis";
 import jwt from "jsonwebtoken";
 import { config } from "../../config/index.js";
-import { Google } from "../../models/google.model.js";
-import { User } from "../../models/user.model.js";
+import { Google, User } from "../../models/index.js";
 
 const { client_id, client_secret, redirect_uris } = config.google.web;
 

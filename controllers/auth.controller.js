@@ -1,5 +1,4 @@
-import { Discord } from "../models/discord.model.js";
-import { User } from "../models/user.model.js";
+import { Discord, User } from "../models/index.js";
 import jwt from "jsonwebtoken";
 import { config } from "../config/index.js";
 import { successResponse, errorResponse } from "../utils/response.js";
