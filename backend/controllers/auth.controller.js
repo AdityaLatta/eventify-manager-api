@@ -1,4 +1,3 @@
-import jwt from "jsonwebtoken";
 import { config } from "../config/index.js";
 import { Discord, User } from "../models/index.js";
 import {
@@ -18,7 +17,7 @@ import { logger } from "../utils/winston.js";
 
 export const login = (req, res) => {
     const url = generateAuthUrl();
-    successResponse(res, { Message: "Please visit url below to login", url });
+    res.redirect(url);
 };
 
 export const auth = asyncHandler(async (req, res) => {
@@ -36,23 +35,6 @@ export const auth = asyncHandler(async (req, res) => {
 
     const token = getJwtToken(payload);
 
-    successResponse(res, { token });
-});
-
-export const setToken = asyncHandler(async (req, res) => {
-    const { token } = req.body;
-
-    if (!token) {
-        return errorResponse(res, "Invalid token", 401);
-    }
-
-    try {
-        jwt.verify(token, config.jwt.JWT_SECRET);
-    } catch (error) {
-        logger.error(`Token validation error: ${error.message}`);
-        return errorResponse(res, "Invalid token", 401);
-    }
-
     res.cookie("auth-token", token, {
         httpOnly: true,
         secure: true,
@@ -60,8 +42,10 @@ export const setToken = asyncHandler(async (req, res) => {
         maxAge: 36000000,
     });
 
-    successResponse(res, { message: "cookies set successfully" });
+    res.redirect(config.frontend.url);
 });
+
+
 
 export const logout = asyncHandler(async (req, res) => {
     res.clearCookie("auth-token", {
