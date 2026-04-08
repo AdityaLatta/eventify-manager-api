@@ -5,7 +5,7 @@ import {
     generateAuthUrl,
     getJwtToken,
     getUserProfile,
-    oauth2Client,
+    getTokensFromCode,
     saveUser,
 } from "../services/google/auth.service.js";
 import {
@@ -24,10 +24,9 @@ export const login = (req, res) => {
 export const auth = asyncHandler(async (req, res) => {
     const { code } = req.query;
 
-    const { tokens } = await oauth2Client.getToken(code);
-    oauth2Client.setCredentials(tokens);
+    const tokens = await getTokensFromCode(code);
 
-    let { email } = await getUserProfile();
+    let { email } = await getUserProfile(tokens);
 
     const user = await saveUser(email, tokens.refresh_token);
 
