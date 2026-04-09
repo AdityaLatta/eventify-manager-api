@@ -3,6 +3,7 @@ import {
   auth,
   login,
   logout,
+  getMe,
   updateDiscord,
   webhook,
 } from "../controllers/auth.controller.js";
@@ -11,6 +12,8 @@ import { isAuthenticated } from "../middlewares/auth.middleware.js";
 const router = Router();
 
 router.get("/login", login);
+
+router.get("/me", isAuthenticated, getMe);
 
 router.get("/", auth);
 

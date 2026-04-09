@@ -87,6 +87,27 @@ export const updateDiscord = asyncHandler(async (req, res) => {
     successResponse(res, { message: "Discord ID updated successfully" });
 });
 
+export const getMe = asyncHandler(async (req, res) => {
+    const user = await User.findByPk(req.userId, {
+        include: [
+            {
+                model: Discord,
+                attributes: ["discordId"],
+            },
+        ],
+    });
+
+    if (!user) {
+        return errorResponse(res, "User not found", 404);
+    }
+
+    successResponse(res, {
+        id: user.id,
+        email: user.email,
+        discordId: user.Discord ? user.Discord.discordId : null,
+    });
+});
+
 export const webhook = asyncHandler(async (req, res) => {
     if (req.headers["x-goog-channel-token"] !== config.google.webhook.secret) {
         return res.sendStatus(403);
