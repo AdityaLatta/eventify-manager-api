@@ -31,3 +31,16 @@ export const useLogout = () => {
     },
   });
 };
+
+export const useUpdateDiscord = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (discordId: string) => {
+      const { data } = await api.post("/auth/update-discord", { discordId });
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["user"] });
+    },
+  });
+};

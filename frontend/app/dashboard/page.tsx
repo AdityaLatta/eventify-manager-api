@@ -1,13 +1,45 @@
 "use client";
 
-import { useUser, useLogout } from "@/hooks/use-auth";
+import { useState, useEffect } from "react";
+import { useUser, useLogout, useUpdateDiscord } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { LogOut, User, ShieldCheck } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { LogOut, User, ShieldCheck, HelpCircle, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 
 export default function DashboardPage() {
   const { data: user, isLoading } = useUser();
   const logout = useLogout();
+  const updateDiscord = useUpdateDiscord();
+  
+  const [discordId, setDiscordId] = useState("");
+  const [validationError, setValidationError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (user?.discordId) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setDiscordId(user.discordId);
+    }
+  }, [user?.discordId]);
+
+  const handleUpdateDiscord = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setValidationError(null);
+    updateDiscord.reset();
+
+    if (!/^\d{17,20}$/.test(discordId)) {
+      setValidationError("Discord ID must be 17-20 digits.");
+      return;
+    }
+
+    try {
+      await updateDiscord.mutateAsync(discordId);
+    } catch (err) {
+      // Error state is managed by React Query; we catch here to prevent unhandled promise rejection
+      console.error("Discord update failed:", err);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -70,23 +102,70 @@ export default function DashboardPage() {
                 <ShieldCheck className="h-5 w-5 text-blue-400" />
                 Integrations
               </CardTitle>
+              <CardDescription className="text-zinc-500">
+                Manage your external account connections.
+              </CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="p-4 rounded-xl bg-black/40 border border-white/5">
-                <div className="flex justify-between items-center">
-                  <div className="flex flex-col">
-                    <span className="text-zinc-200 font-medium text-sm">Discord Bot</span>
-                    <span className="text-zinc-500 text-xs">
-                      {user?.discordId ? "Linked" : "Not Linked"}
-                    </span>
+            <CardContent className="space-y-6">
+              <form onSubmit={handleUpdateDiscord} className="space-y-4">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="discordId" className="text-zinc-300">Discord ID</Label>
+                    <div className="group relative">
+                      <HelpCircle className="h-4 w-4 text-zinc-500 cursor-help hover:text-zinc-300 transition-colors" />
+                      <div className="absolute bottom-full right-0 mb-2 w-48 p-2 bg-zinc-800 text-[10px] text-zinc-300 rounded shadow-xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-20">
+                        Enable &quot;Developer Mode&quot; in Discord Settings &gt; Advanced, then right-click your profile to &quot;Copy User ID&quot;.
+                      </div>
+                    </div>
                   </div>
-                  <div className={`h-2 w-2 rounded-full ${user?.discordId ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]' : 'bg-zinc-700'}`} />
+                  <Input 
+                    id="discordId"
+                    value={discordId}
+                    onChange={(e) => setDiscordId(e.target.value)}
+                    placeholder="e.g. 123456789012345678"
+                    className="bg-black/50 border-white/10 text-zinc-200 focus:border-blue-500/50 transition-colors"
+                  />
                 </div>
-                {user?.discordId && (
-                   <div className="mt-2 text-xs text-zinc-500 font-mono">
-                     ID: {user.discordId}
-                   </div>
+                
+                <Button 
+                  type="submit" 
+                  disabled={updateDiscord.isPending}
+                  className="w-full bg-blue-600 hover:bg-blue-500 text-white font-medium transition-all"
+                >
+                  {updateDiscord.isPending ? (
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  ) : (
+                    "Update Discord Link"
+                  )}
+                </Button>
+
+                {updateDiscord.isSuccess && (
+                  <div className="flex items-center gap-2 text-xs text-green-400 animate-in fade-in slide-in-from-top-1">
+                    <CheckCircle2 className="h-3.5 w-3.5" />
+                    Discord ID updated successfully!
+                  </div>
                 )}
+
+                {(validationError || updateDiscord.isError) && (
+                  <div className="flex items-center gap-2 text-xs text-red-400 animate-in fade-in slide-in-from-top-1">
+                    <AlertCircle className="h-3.5 w-3.5" />
+                    {validationError || 
+                     (updateDiscord.error as { response?: { data?: { message?: string } } })?.response?.data?.message || 
+                     "Failed to update Discord ID"}
+                  </div>
+                )}
+              </form>
+
+              <div className="pt-4 border-t border-white/5">
+                <div className="flex justify-between items-center text-xs">
+                  <span className="text-zinc-500">Integration Status</span>
+                  <div className="flex items-center gap-2">
+                    <span className={user?.discordId ? "text-green-400" : "text-zinc-500"}>
+                      {user?.discordId ? "Active" : "Not Linked"}
+                    </span>
+                    <div className={`h-2 w-2 rounded-full ${user?.discordId ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]' : 'bg-zinc-700'}`} />
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>
